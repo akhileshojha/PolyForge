@@ -46,3 +46,5 @@ Desktop.ini
 
 # Ignore output zips
 *.zip
+
+.last_build_hash

@@ -7,8 +7,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(new TelemetryMiddleware().use);
   const config = new DocumentBuilder()
-    .setTitle('Template Service')
-    .setDescription('NestJS Service API with OpenAPI + Telemetry')
+    .setTitle('PolyForge Service Registry')
+    .setDescription('API documentation for microservice registry')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
