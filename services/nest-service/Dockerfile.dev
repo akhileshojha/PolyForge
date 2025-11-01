@@ -1,0 +1,22 @@
+# --- Development Dockerfile for NestJS ---
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Ensure dev dependencies are installed
+ENV NODE_ENV=development
+
+# Copy dependency files
+COPY package.json pnpm-lock.yaml* ./
+
+# Install pnpm and dependencies (including dev deps)
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
+
+# Copy all source files
+COPY . .
+
+# Expose app port
+EXPOSE 3000
+
+# Run in development mode with hot reload
+CMD ["pnpm", "run", "start:dev"]

@@ -1,0 +1,81 @@
+services:
+  nest-service:
+    build:
+      context: ./services/nest-service
+      dockerfile: Dockerfile.dev
+    container_name: nest-service
+    command: pnpm run start:dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MONGO_URI=mongodb://root:example@mongo:27017/polyforge?authSource=admin
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+    volumes:
+      - ./services/nest-service:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+      - go-service
+      - otel-collector
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  go-service:
+    build:
+      context: ./services/go-service
+      dockerfile: Dockerfile
+    container_name: go-service
+    ports:
+      - "3001:3001"
+    environment:
+      - GIN_MODE=release
+      - TRUSTED_PROXIES=127.0.0.1
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    command: ["--auth", "--bind_ip_all"]
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')", "-u", "root", "-p", "example", "--authenticationDatabase", "admin"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.85.0
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:13133/"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  mongo_data:

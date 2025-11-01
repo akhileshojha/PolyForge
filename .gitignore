@@ -1,5 +1,5 @@
 # Docker
-**/Dockerfile.*
+# **/Dockerfile.*
 docker-compose.override.yml
 *.tar
 *.img
