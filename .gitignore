@@ -1,0 +1,48 @@
+# Docker
+**/Dockerfile.*
+docker-compose.override.yml
+*.tar
+*.img
+*.bak
+
+# Build artifacts
+build/
+dist/
+tmp/
+.cache/
+*.log
+
+# Logs
+logs/
+**/logs/
+*.pid
+*.pid.lock
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+coverage/
+reports/
+*.xml
+*.html
+
+# OS junk
+__MACOSX/
+Desktop.ini
+
+# Ignore output zips
+*.zip
